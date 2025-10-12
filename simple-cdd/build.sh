@@ -1,8 +1,3 @@
-#apt update && apt upgrade -y
-#apt install simple-cdd sudo
-#sudo adduser debian sudo
-#sudo apt-get install --reinstall debian-archive-keyring
-
 #Build ISO
 build-simple-cdd --conf simple-cdd.conf --debug
 cd tmp/cd-build/bookworm
