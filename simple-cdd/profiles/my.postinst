@@ -1,0 +1,60 @@
+# Install packages
+echo "[*] Updating package lists..."
+apt-get update -y
+
+echo "[*] Installing required tools..."
+apt-get install -y wget curl dpkg
+
+echo "[*] Setting up SUDO..."
+echo "rhs-node ALL=(ALL:ALL) ALL" >> /etc/sudoers
+
+# SSH Config
+mkdir -p /home/rhs-node/.ssh
+curl github.com/almarblock.keys -o - -L >> /home/rhs-node/.ssh/authorized_keys
+
+# Folding@Home Install Script
+
+TEAM_ID="1065641"                                          # Enter your Team ID here
+FAH_VERSION="8.4.9"                                        # The latest version according to the download page
+FAH_TOKEN="l-mlxl-msE-XBsE-qdECUqdDQCZHDQCZQ0xczQ0xkAo"    # Enter your Folding@Home token here 
+
+DEBIAN_FRONTEND=noninteractive
+
+echo "[*] Downloading FAHClient $FAH_VERSION from foldingathome.org..."
+FahDeb="/tmp/fah-client_${FAH_VERSION}_amd64.deb"
+wget -O "$FahDeb" "https://download.foldingathome.org/releases/public/fah-client/debian-10-64bit/release/fah-client_${FAH_VERSION}_amd64.deb"
+
+echo "[*] Starting installation..."
+sudo dpkg -i "$FahDeb" || sudo apt-get install -f -y
+
+echo "[*] Cleaning up..."
+rm -f "$FahDeb"
+
+echo "[*] Writing empty config to avoid first-run dialog..."
+CONFIG="/etc/fah-client/config.xml"
+sudo touch "$CONFIG"
+
+echo "[*] Writing basic configuration..."
+sudo tee "$CONFIG" > /dev/null <<XML
+<?xml version='1.0' encoding='UTF-8'?>
+<config>
+    <gpu v="true"/>
+    <cpu v="true"/>
+    <slot id="0" type="CPU"/>
+    <slot id="1" type="GPU"/>
+    <power v="full"/>
+    <allow>0.0.0.0/0</allow>
+    <account-token>$FAH_TOKEN</account-token>
+    <domains>node2.foldingathome.org</domains>
+</config>
+XML
+
+chmod 644 "$CONFIG"
+chown root:root "$CONFIG"
+
+echo "[*] Enabling/starting FAHClient via systemd..."
+systemctl enable fah-client
+systemctl restart fah-client
+
+echo "[*] Status:"
+systemctl status --no-pager -l fah-client
