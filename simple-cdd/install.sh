@@ -1,10 +1,20 @@
+# Checks if the script is running as root
 if [[ $EUID -ne 0 ]]; then
-  echo "You must be root to run this script. Us 'su' to become root" >&2
+  echo "You must be root to run this script. Use 'su' to switch to the root account." >&2
   exit 1
 fi
+
+# Updates the APT package index and installs available updates
 apt update && apt upgrade -y
+
+# Installs the required packages for building the ISO
 apt install simple-cdd sudo
-read -p "Pleas type the username of your defualt user (non root): " CURRENT_USER
+
+# Adds the specified non-root user to the sudo group to allow administrative privileges
+read -p "Please enter the username of your default non-root user that will run the build process: " CURRENT_USER
 sudo adduser $CURRENT_USER sudo
 echo "$CURRENT_USER ALL=(ALL:ALL) ALL" >> /etc/sudoers
-#sudo apt-get install --reinstall debian-archive-keyring
+
+## The following command can help resolve errors during the build process,
+## but it is usually not required:
+# sudo apt-get install --reinstall debian-archive-keyring
