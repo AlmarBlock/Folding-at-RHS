@@ -18,3 +18,13 @@ echo "$CURRENT_USER ALL=(ALL:ALL) ALL" >> /etc/sudoers
 ## The following command can help resolve errors during the build process,
 ## but it is usually not required:
 # sudo apt-get install --reinstall debian-archive-keyring
+
+
+chmod +x build.sh
+chmod +x simple-cdd.conf
+chmod +x profiles/my.downloads
+chmod +x profiles/my.excludes
+chmod +x profiles/my.packages
+chmod +x profiles/my.postinst
+chmod +x profiles/my.preseed
+chmod +x profiles/my.udebs

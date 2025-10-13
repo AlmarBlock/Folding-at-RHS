@@ -19,7 +19,7 @@ Clone the contents of the *simple-cdd* folder to your Debian installation.
 ### 2. Installing necessary packages
 Navigate to the location where you cloned the *simple-cdd* folder, then run:
 ```shell
-./install.sh
+chmod +x ./install.sh && ./install.sh
 ```
 This will install all the necessary packages and add the selected user to the sudoers file.
 
