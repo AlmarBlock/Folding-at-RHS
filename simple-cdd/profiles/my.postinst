@@ -10,7 +10,7 @@ echo "rhs-node ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
 # SSH Config
 mkdir -p /home/rhs-node/.ssh
-curl github.com/almarblock.keys -o - -L >> /home/rhs-node/.ssh/authorized_keys
+sudo curl -L -k  github.com/almarblock.keys | sudo tee /home/rhs-node/.ssh/authorized_keys > /dev/null
 
 # Folding@Home Install Script
 
