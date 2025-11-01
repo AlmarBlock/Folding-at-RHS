@@ -40,6 +40,13 @@ to create a new ISO image that can be used to deploy new servers for the Folding
 After the build script completes successfully, you can find your new ISO image in the `./images` folder.
 Use a tool such as [Rufus](https://rufus.ie/) or [Ventoy](https://www.ventoy.net/en/index.html) to create a bootable USB drive from the ISO image.
 
+### 5. After compleating the installation
+After compleating the installation, you can boot the servers back up and log in the the creadatials `rhs-node` and `rhs` as the password. For easy SSH managment it is recomanded to set a hostname on every mashine, to do that run the command:
+
+`hostnamectl set-hostname <hostname>` 
+
+`"<hostname>"` must be replaced by the actuall hostname (it must be a diffrent one for every server!).
+
 ## Problems booting the Servers
 - Try to reseading all memory sticks.
 - Try booting with one stick first and add the others one by one afterwards.
