@@ -38,4 +38,10 @@ to create a new ISO image that can be used to deploy new servers for the Folding
 
 ### 4. Creating a bootable USB-Drive
 After the build script completes successfully, you can find your new ISO image in the `./images` folder.
-Use a tool such as [Rufus](https://rufus.ie/) to create a bootable USB drive from the ISO image.
+Use a tool such as [Rufus](https://rufus.ie/) or [Ventoy](https://www.ventoy.net/en/index.html) to create a bootable USB drive from the ISO image.
+
+## Problems booting the Servers
+- Try to reseading all memory sticks.
+- Try booting with one stick first and add the others one by one afterwards.
+- Check for a brocken power cable.
+- Good Luck .....
