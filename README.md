@@ -43,5 +43,5 @@ Use a tool such as [Rufus](https://rufus.ie/) or [Ventoy](https://www.ventoy.net
 ## Problems booting the Servers
 - Try to reseading all memory sticks.
 - Try booting with one stick first and add the others one by one afterwards.
-- Check for a brocken power cable.
+- Check for a broken power-cable.
 - Good Luck .....
