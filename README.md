@@ -47,6 +47,12 @@ After compleating the installation, you can boot the servers back up and log in 
 
 `"<hostname>"` must be replaced by the actuall hostname (it must be a diffrent one for every server!).
 
+## Update the FAH version
+Run the following command and chnage the URL to the one pointing to the newest version of FAH.
+```shell
+curl https://download.foldingathome.org/releases/public/fah-client/debian-10-64bit/release/fah-client_8.5.5_amd64.deb -o fah-client_client_update.deb && sudo apt install ./fah-client_client_update.deb && sudo systemctl restart fah-client && rm ./fah-client_update.deb
+```
+
 ## Problems booting the Servers
 - Try to reseading all memory sticks.
 - Try booting with one stick first and add the others one by one afterwards.
