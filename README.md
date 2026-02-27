@@ -2,7 +2,7 @@
 This repository includes all the tools required to create and manage the Folding@Home servers of RHS.
 
 ## Management of the Server Cluster
-- All cluster control is done through the official web portal: https://v8-4.foldingathome.org  
+- All cluster control is done through the official web portal: https://v8-5.foldingathome.org  
 - The login information required for this site is stored at the school.  
 - New machines should be added automatically if all configurations were set up correctly.
 
