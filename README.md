@@ -50,7 +50,7 @@ After compleating the installation, you can boot the servers back up and log in 
 ## Update the FAH version
 Run the following command and chnage the URL to the one pointing to the newest version of FAH.
 ```shell
-curl https://download.foldingathome.org/releases/public/fah-client/debian-10-64bit/release/fah-client_8.5.5_amd64.deb -o fah-client_client_update.deb && sudo apt install ./fah-client_client_update.deb && sudo systemctl restart fah-client && rm ./fah-client_update.deb
+sudo curl https://download.foldingathome.org/releases/public/fah-client/debian-10-64bit/release/fah-client_8.5.5_amd64.deb -o fah-client_client_update.deb && sudo apt install ./fah-client_client_update.deb && sudo systemctl restart fah-client && rm ./fah-client_update.deb
 ```
 
 ## Problems booting the Servers
