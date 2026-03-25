@@ -1,36 +1,36 @@
-Hier ist ein kompaktes Tutorial, mit dem du deinen Debian‑Rechner so einrichtest, dass:
+Here is a compact tutorial to set up your Debian machine so that:
 
-- er sich per WPA2‑Enterprise (PEAP/MSCHAPv2) ins WLAN einwählt  
-- dein LAN‑Port als Router für andere Geräte dient  
-- der gesamte LAN‑Traffic durch Cloudflare WARP getunnelt wird  
+- it connects to the WLAN via WPA2-Enterprise (PEAP/MSCHAPv2)
+- your LAN port serves as a router for other devices
+- all LAN traffic is tunneled through Cloudflare WARP
 
-Alle Schritte sind so sortiert, dass Du sie einmal „sauber“ durchgehen kannst.
+All steps are ordered so you can go through them cleanly once.
 
 ***
 
-## 1. Voraussetzungen prüfen
+## 1. Check Prerequisites
 
-Interface‑Namen ermitteln:
+Determine interface names:
 
 ```bash
 ip a
 ```
 
-In deinem Setup waren relevant:
+In your setup, the relevant ones were:
 
-- WLAN: `wlp2s0` (WPA2‑Enterprise uplink)  
-- LAN nach innen: `eno1` (192.168.50.1, DHCP für Clients)  
-- zusätzliches WAN‑LAN: `enp1s0f1` (direkter Internetanschluss, optional)  
-- WARP‑Interface: `CloudflareWARP` (172.16.0.2/32)
+- WLAN: `wlp2s0` (WPA2-Enterprise uplink)
+- LAN inward: `eno1` (192.168.50.1, DHCP for clients)
+- additional WAN-LAN: `enp1s0f1` (direct internet connection, optional)
+- WARP interface: `CloudflareWARP` (172.16.0.2/32)
 
-Systempakete installieren:
+Install system packages:
 
 ```bash
 sudo apt update
 sudo apt install wpa_supplicant dnsmasq iptables iptables-persistent
 ```
 
-IP‑Weiterleitung dauerhaft aktivieren:
+Permanently enable IP forwarding:
 
 ```bash
 echo 'net.ipv4.ip_forward=1' | sudo tee -a /etc/sysctl.conf
@@ -39,15 +39,15 @@ sudo sysctl -p
 
 ***
 
-## 2. WPA2‑Enterprise (PEAP/MSCHAPv2) einrichten
+## 2. Set up WPA2-Enterprise (PEAP/MSCHAPv2)
 
-Konfigurationsdatei für `wpa_supplicant` anlegen, z.B.:
+Create configuration file for `wpa_supplicant`, e.g.:
 
 ```bash
 sudo nano /etc/wpa_supplicant/wpa_supplicant-wlp2s0.conf
 ```
 
-Inhalt (an deine Daten anpassen):
+Content (adapt to your data):
 
 ```conf
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
@@ -57,37 +57,37 @@ ap_scan=1
 fast_reauth=1
 
 network={
-    ssid="DEINE_SSID"
+    ssid="YOUR_SSID"
     scan_ssid=1
     key_mgmt=WPA-EAP
     eap=PEAP
-    identity="dein_username@realm.de"
-    password="dein_passwort"
+    identity="your_username@realm.de"
+    password="your_password"
     phase1="peaplabel=1"
     phase2="auth=MSCHAPV2"
     pairwise=CCMP TKIP
 }
 ```
 
-Rechte anpassen:
+Adjust permissions:
 
 ```bash
 sudo chmod 600 /etc/wpa_supplicant/wpa_supplicant-wlp2s0.conf
 ```
 
-Systemd‑Service aktivieren:
+Enable systemd service:
 
 ```bash
 sudo systemctl enable --now wpa_supplicant@wlp2s0.service
 ```
 
-IP per DHCP holen (falls nicht automatisch):
+Get IP via DHCP (if not automatic):
 
 ```bash
 sudo dhclient wlp2s0
 ```
 
-Verbindung testen:
+Test connection:
 
 ```bash
 ping -c 3 8.8.8.8 -I wlp2s0
@@ -95,9 +95,9 @@ ping -c 3 8.8.8.8 -I wlp2s0
 
 ***
 
-## 3. Cloudflare WARP installieren und aktivieren
+## 3. Install and Activate Cloudflare WARP
 
-Repository hinzufügen und WARP‑Client installieren:
+Add repository and install WARP client:
 
 ```bash
 curl https://pkg.cloudflareclient.com/pubkey.gpg \
@@ -110,15 +110,15 @@ sudo apt update
 sudo apt install cloudflare-warp
 ```
 
-WARP registrieren und verbinden:
+Register and connect WARP:
 
 ```bash
 sudo warp-cli register
-sudo warp-cli mode warp     # Voll-Tunnel
+sudo warp-cli mode warp     # Full tunnel
 sudo warp-cli connect
 ```
 
-Status prüfen:
+Check status:
 
 ```bash
 warp-cli status
@@ -127,15 +127,15 @@ ip a show CloudflareWARP
 
 ***
 
-## 4. LAN‑Interface als internes Netz konfigurieren
+## 4. Configure LAN Interface as Internal Network
 
-Statische IP für `eno1`:
+Static IP for `eno1`:
 
 ```bash
 sudo nano /etc/network/interfaces
 ```
 
-Einfügen:
+Insert:
 
 ```conf
 auto eno1
@@ -144,16 +144,16 @@ iface eno1 inet static
     netmask 255.255.255.0
 ```
 
-Interface hochfahren:
+Bring up interface:
 
 ```bash
 sudo ifup eno1
-# alternativ, falls nötig:
+# alternatively, if necessary:
 # sudo ip addr add 192.168.50.1/24 dev eno1
 # sudo ip link set eno1 up
 ```
 
-Kontrolle:
+Check:
 
 ```bash
 ip a show eno1
@@ -161,61 +161,61 @@ ip a show eno1
 
 ***
 
-## 5. dnsmasq als DHCP‑Server für das LAN
+## 5. dnsmasq as DHCP Server for LAN
 
-dnsmasq so konfigurieren, dass es nur für das interne LAN zuständig ist, keinen lokalen DNS‑Port belegt (damit WARP DNS benutzen kann), aber den Clients DNS mitliefert.
+Configure dnsmasq so it is only responsible for the internal LAN, does not occupy a local DNS port (so WARP can use DNS), but provides DNS to clients.
 
-Konfiguration bearbeiten:
+Edit configuration:
 
 ```bash
 sudo nano /etc/dnsmasq.conf
 ```
 
-Minimaler, zum Setup passender Inhalt:
+Minimal content suitable for the setup:
 
 ```conf
 interface=eno1
 bind-interfaces
 
-# Kein lokaler DNS auf Port 53, damit WARP systemweit DNS übernehmen kann
+# No local DNS on port 53, so WARP can take over system-wide DNS
 port=0
 
-# DHCP-Bereich
+# DHCP range
 dhcp-range=192.168.50.10,192.168.50.100,12h
 
-# Standard-Gateway
+# Default gateway
 dhcp-option=option:router,192.168.50.1
 
-# Den Clients DNS mitgeben – sie fragen 192.168.50.1, das System löst dann über WARP
+# Provide DNS to clients – they query 192.168.50.1, the system resolves via WARP
 dhcp-option=option:dns-server,192.168.50.1
 ```
 
-Dienst neu starten:
+Restart service:
 
 ```bash
 sudo systemctl restart dnsmasq
 sudo systemctl status dnsmasq
 ```
 
-Jetzt sollten sich z.B. dein MacBook oder andere Geräte per DHCP eine Adresse wie `192.168.50.38` holen können.
+Now, e.g., your MacBook or other devices should be able to get an address like `192.168.50.38` via DHCP.
 
 ***
 
-## 6. NAT: LAN‑Traffic durch CloudflareWARP tunneln
+## 6. NAT: Tunnel LAN Traffic through CloudflareWARP
 
-NAT‑Regel setzen, damit alle Clients aus 192.168.50.0/24 über das WARP‑Interface ins Internet gehen:
+Set NAT rule so all clients from 192.168.50.0/24 go to the internet via the WARP interface:
 
 ```bash
 sudo iptables -t nat -A POSTROUTING -s 192.168.50.0/24 -o CloudflareWARP -j MASQUERADE
 ```
 
-Regeln dauerhaft speichern:
+Save rules permanently:
 
 ```bash
 sudo netfilter-persistent save
 ```
 
-Regeln prüfen:
+Check rules:
 
 ```bash
 sudo iptables -t nat -L -n -v | grep 192.168.50
@@ -223,95 +223,95 @@ sudo iptables -t nat -L -n -v | grep 192.168.50
 
 ***
 
-## 7. Policy‑Routing: LAN‑Traffic explizit an WARP binden
+## 7. Policy Routing: Explicitly Bind LAN Traffic to WARP
 
-Damit nur der Traffic aus deinem LAN sicher über CloudflareWARP geht (und der Host selbst seine Standard‑Routen behalten kann), legst du eine eigene Routing‑Tabelle an und bindest das LAN daran.
+So that only traffic from your LAN goes securely through CloudflareWARP (and the host itself keeps its standard routes), create a separate routing table and bind the LAN to it.
 
-Routing‑Tabellen definieren:
+Define routing tables:
 
 ```bash
 sudo nano /etc/iproute2/rt_tables
 ```
 
-Ans Ende hinzufügen:
+Add to the end:
 
 ```text
 100 warp-lan
 ```
 
-Routing‑Regel für das LAN‑Netz:
+Routing rule for the LAN network:
 
 ```bash
 sudo ip rule add from 192.168.50.0/24 table 100 priority 50
 ```
 
-Tabelle 100 mit WARP‑Default‑Route füllen:
+Fill table 100 with WARP default route:
 
 ```bash
 sudo ip route add 192.168.50.0/24 dev eno1 table 100
 sudo ip route add default dev CloudflareWARP src 172.16.0.2 table 100
 ```
 
-Kontrolle:
+Check:
 
 ```bash
 ip rule show | grep 192.168
 ip route show table 100
 ```
 
-Du solltest sehen:
+You should see:
 
-- eine Regel `from 192.168.50.0/24 lookup 100`  
-- und in Tabelle 100: `default dev CloudflareWARP` sowie die 192.168.50.0/24‑Route über `eno1`.
+- a rule `from 192.168.50.0/24 lookup 100`
+- and in table 100: `default dev CloudflareWARP` as well as the 192.168.50.0/24 route via `eno1`.
 
 ***
 
-## 8. DNS für Clients steuern (optional)
+## 8. Control DNS for Clients (optional)
 
-Wenn du bestimmten Geräten eigene DNS‑Server zuweisen willst (z.B. MacBook → Cloudflare DNS), kannst du das in `dnsmasq.conf` per MAC‑Adresse machen.
+If you want to assign specific DNS servers to certain devices (e.g., MacBook → Cloudflare DNS), you can do this in `dnsmasq.conf` by MAC address.
 
-Beispiel: MacBook mit MAC `34:29:8f:91:1c:b2` soll 1.1.1.1/1.0.0.1 bekommen:
+Example: MacBook with MAC `34:29:8f:91:1c:b2` should get 1.1.1.1/1.0.0.1:
 
 ```conf
-# in /etc/dnsmasq.conf ergänzen:
+# add to /etc/dnsmasq.conf:
 dhcp-host=34:29:8f:91:1c:b2,set:macbook,dns-server,1.1.1.1,1.0.0.1
 
-# Fallback-DNS für alle anderen:
+# Fallback DNS for all others:
 dhcp-option=option:dns-server,192.168.50.1
 ```
 
-Danach:
+Then:
 
 ```bash
 sudo systemctl restart dnsmasq
 ```
 
-Auf dem Client die Lease erneuern (z.B. auf macOS):
+Renew lease on the client (e.g., on macOS):
 
 ```bash
-# Netzwerk kurz trennen/verbinden oder:
-sudo ipconfig set en0 DHCP   # je nach Interface
+# Disconnect/reconnect network briefly or:
+sudo ipconfig set en0 DHCP   # depending on interface
 ```
 
 ***
 
-## 9. Funktionstests
+## 9. Function Tests
 
-### Auf dem Debian‑Router
+### On the Debian Router
 
-- WARP‑Status:
+- WARP status:
 
 ```bash
 warp-cli status
 ```
 
-- IP‑Weiterleitung:
+- IP forwarding:
 
 ```bash
 sysctl net.ipv4.ip_forward
 ```
 
-- Routen:
+- Routes:
 
 ```bash
 ip a show eno1
@@ -320,69 +320,66 @@ ip rule show | grep 192.168
 ip route show table 100
 ```
 
-### Auf einem LAN‑Client (z.B. MacBook)
+### On a LAN Client (e.g., MacBook)
 
-- IP/DNS prüfen:
+- Check IP/DNS:
 
 ```bash
-# IP (sollte 192.168.50.x sein)
-# unter macOS: Systemeinstellungen → Netzwerk → Details
+# IP (should be 192.168.50.x)
+# on macOS: System Settings → Network → Details
 ```
 
-- Öffentliche IP (muss Cloudflare‑IP sein):
+- Public IP (must be Cloudflare IP):
 
 ```bash
 curl ifconfig.me
 ```
 
-- WARP‑Status (indirekt):
+- WARP status (indirect):
 
 ```bash
 curl https://www.cloudflare.com/cdn-cgi/trace/ | grep warp
-# Ausgabe sollte warp=on enthalten
+# Output should contain warp=on
 ```
 
-Wenn das alles passt, geht sämtlicher Traffic der LAN‑Geräte über das interne Interface `eno1` zum Debian‑Router und von dort durch den CloudflareWARP‑Tunnel ins Internet.
+If all this fits, all traffic from LAN devices goes via the internal interface `eno1` to the Debian router and from there through the Cloudflare WARP tunnel to the internet.
 
 ***
 
-## 10. Autostart sicherstellen
+## 10. Ensure Autostart
 
-Folgende Dienste sollten beim Booten automatisch starten:
+The following services should start automatically on boot:
 
 ```bash
 sudo systemctl enable wpa_supplicant@wlp2s0
 sudo systemctl enable dnsmasq
-# WARP startet seinen Dienst automatisch, ggf. einmal:
+# WARP starts its service automatically, if necessary once:
 warp-cli enable-always-on
 ```
 
-Falls WARP oder Policy‑Routing nach einem Reboot nicht zuverlässig aktiv ist, kannst du ein kleines Skript unter `/etc/network/if-up.d/warp-lan` anlegen:
+If WARP or policy routing is not reliably active after a reboot, you can create a small script at `/etc/network/if-up.d/warp-lan`:
 
 ```bash
 sudo nano /etc/network/if-up.d/warp-lan
 ```
 
-Inhalt:
+Content:
 
 ```bash
 #!/bin/sh
-# Wird ausgeführt, wenn ein Interface "up" geht
+# Executed when an interface goes "up"
 
-# WARP sicher verbinden
+# Safely connect WARP
 warp-cli connect 2>/dev/null
 
-# Policy-Routing für LAN erneut setzen
+# Re-set policy routing for LAN
 ip rule add from 192.168.50.0/24 table 100 priority 50 2>/dev/null
 ip route replace 192.168.50.0/24 dev eno1 table 100 2>/dev/null
 ip route replace default dev CloudflareWARP src 172.16.0.2 table 100 2>/dev/null
 ```
 
-Ausführbar machen:
+Make executable:
 
 ```bash
 sudo chmod +x /etc/network/if-up.d/warp-lan
 ```
-
-Damit solltest du nach jedem Neustart wieder das gleiche Verhalten haben:  
-WPA2‑Enterprise‑Uplink, WARP‑Tunnel und ein LAN, dessen gesamter Traffic sauber durch Cloudflare WARP geht.
