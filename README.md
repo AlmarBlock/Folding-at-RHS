@@ -1,6 +1,9 @@
 # Folding-at-RHS
 This repository includes all the tools required to create and manage the Folding@Home servers of RHS.
 
+## Instruction for the router can be found here:
+https://github.com/AlmarBlock/Folding-at-RHS/blob/main/Cloudflare%20Warp%20Proxy.md#1-check-prerequisites
+
 ## Management of the Server Cluster
 - All cluster control is done through the official web portal: https://v8-5.foldingathome.org  
 - The login information required for this site is stored at the school.  
