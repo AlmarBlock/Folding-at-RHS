@@ -1,3 +1,7 @@
+# Important
+**All steps have been translated and aided to creeate by AI so take everything with a grain of sand and may ask your favorit AI, if questions arise!**
+
+
 Here is a compact tutorial to set up your Debian machine so that:
 
 - it connects to the WLAN via WPA2-Enterprise (PEAP/MSCHAPv2)
