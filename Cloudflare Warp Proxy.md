@@ -1,5 +1,5 @@
 # Important
-**All steps have been translated and aided to creeate by AI so take everything with a grain of sand and may ask your favorit AI, if questions arise!**
+**All steps have been translated and aided to create by AI so take everything with a grain of sand and may ask your favorit AI, if questions arise!**
 
 ---
 
